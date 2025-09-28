@@ -339,6 +339,55 @@
         .flatpickr-day.disabled {
             color: #666;
         }
+
+        /* Next Page Arrow Button */
+        .next-page-arrow {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--gold), var(--dark-gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            border: 2px solid var(--primary-purple);
+            z-index: 1000;
+        }
+
+        .next-page-arrow:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+
+        .next-page-arrow svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--black);
+            transition: transform 0.3s ease;
+        }
+
+        .next-page-arrow:hover svg {
+            transform: translateX(3px);
+        }
+
+        @media (max-width: 768px) {
+            .next-page-arrow {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .next-page-arrow svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -348,7 +397,12 @@
             <p class="tagline">Premium Massage Therapy & Wellness</p>
         </div>
 
-        <form class="booking-form" id="bookingForm">
+        <form class="booking-form" id="bookingForm" action="https://formspree.io/f/xldpgneq" method="POST">
+            <!-- Formspree Configuration -->
+            <input type="hidden" name="_next" value="thank-you.html">
+            <input type="hidden" name="_subject" value="New Massage Booking Request">
+            <input type="hidden" name="_captcha" value="false">
+            
             <!-- Personal Information -->
             <div class="form-section">
                 <h2 class="section-title">Personal Information</h2>
@@ -453,6 +507,11 @@
                 Total: <span id="totalPrice">0</span> Le
             </div>
 
+            <!-- Hidden fields for form data compilation -->
+            <input type="hidden" id="serviceDetails" name="serviceDetails">
+            <input type="hidden" id="finalPrice" name="finalPrice">
+            <input type="hidden" id="submissionTimestamp" name="submissionTimestamp">
+
             <!-- Submit Button -->
             <button type="submit" class="submit-btn" id="submitBtn">Book Your Session</button>
             
@@ -468,17 +527,20 @@
 
         <div class="footer">
             <p>&copy; 2025 Revive with Sade. Professional massage therapy services.</p>
-            <p>Contact us: revivewithsade@gmail.com</p>
+            <p>Contact us: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="740611021d0211031d001c07151011341319151d185a171b19">[email&#160;protected]</a></p>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-    <script>
-        // Initialize EmailJS
-        emailjs.init("hCetBXhyuI4v5KKHr");
+    <!-- Next Page Arrow -->
+    <div class="next-page-arrow" id="nextPageArrow" onclick="goToNextPage()">
+        <svg viewBox="0 0 24 24">
+            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/>
+        </svg>
+    </div>
 
+    <!-- Scripts -->
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
         // Global variables
         let selectedService = null;
         let selectedPrice = 0;
@@ -539,7 +601,23 @@
                 });
             });
 
-            document.getElementById('bookingForm').addEventListener('submit', handleFormSubmission);
+            // Fixed form submission handler - simpler approach
+            document.getElementById('bookingForm').addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Prepare form data
+                prepareFormData();
+                
+                // Show loading state
+                document.getElementById('loadingDiv').style.display = 'block';
+                document.getElementById('submitBtn').disabled = true;
+                
+                // Let form submit naturally to Formspree
+                // Don't prevent default - this allows Formspree to handle the submission
+            });
         }
 
         // Populate time slots
@@ -602,25 +680,28 @@
             }
         }
 
-        // Handle form submission
-        function handleFormSubmission(e) {
-            e.preventDefault();
-
-            if (!validateForm()) {
-                return;
-            }
-
-            const formData = new FormData(e.target);
-            const bookingData = Object.fromEntries(formData.entries());
+        // Prepare form data with compiled information
+        function prepareFormData() {
+            const serviceDetails = {
+                "30min": { name: "Relaxation Session", duration: "30 Minutes" },
+                "60min": { name: "Full Body Massage", duration: "60 Minutes" }
+            };
             
-            bookingData.selectedDate = document.getElementById('bookingDate').value;
-            bookingData.selectedTime = document.getElementById('bookingTime').value;
-            bookingData.finalPrice = document.getElementById('totalPrice').textContent;
-
-            document.getElementById('loadingDiv').style.display = 'block';
-            document.getElementById('submitBtn').disabled = true;
-
-            sendBookingEmail(bookingData);
+            const serviceInfo = serviceDetails[selectedService] || 
+                               { name: selectedService, duration: "Not specified" };
+            
+            const locationType = document.getElementById('locationType').value;
+            const finalPrice = document.getElementById('totalPrice').textContent;
+            
+            // Compile service details
+            const compiledServiceDetails = `${serviceInfo.name} (${serviceInfo.duration}) - ${finalPrice} Le`;
+            document.getElementById('serviceDetails').value = compiledServiceDetails;
+            
+            // Set final price
+            document.getElementById('finalPrice').value = finalPrice + ' Le';
+            
+            // Set submission timestamp
+            document.getElementById('submissionTimestamp').value = new Date().toLocaleString();
         }
 
         // Validate form
@@ -660,69 +741,14 @@
             return isValid;
         }
 
-        // Send booking email - CORRECTED VERSION
-        function sendBookingEmail(bookingData) {
-            // Service details mapping
-            const serviceDetails = {
-                "30min": { name: "Relaxation Session", duration: "30 Minutes" },
-                "60min": { name: "Full Body Massage", duration: "60 Minutes" }
-            };
+        // Navigate to next page
+        function goToNextPage() {
+            // Replace 'next-page.html' with your actual next page URL
+            window.location.href = 'next-page.html';
             
-            const serviceInfo = serviceDetails[bookingData.selectedService] || 
-                               { name: bookingData.selectedService, duration: "Not specified" };
-            
-            const templateParams = {
-                from_name: `${bookingData.firstName} ${bookingData.lastName}`,
-                from_email: bookingData.email,
-                phone: bookingData.phone,
-                service_type: serviceInfo.name,
-                duration: serviceInfo.duration,
-                booking_date: bookingData.selectedDate,
-                booking_time: bookingData.selectedTime,
-                location: bookingData.locationType === 'address' ? 'Mobile Service' : 'Studio Location',
-                address: bookingData.clientAddress || 'Studio Location',
-                price: bookingData.finalPrice + ' Le',
-                message: bookingData.specialRequests || 'None',
-                referral_source: 'Website Booking Form',
-                submission_date: new Date().toLocaleDateString() + ' at ' + new Date().toLocaleTimeString()
-            };
-
-            emailjs.send('service_1k6cw1r', 'template_hvr8mvc', templateParams)
-                .then(function(response) {
-                    console.log('SUCCESS!', response.status, response.text);
-                    handleBookingSuccess(bookingData);
-                }, function(error) {
-                    console.log('FAILED...', error);
-                    handleBookingError();
-                });
-        }
-
-        // Handle successful booking
-        function handleBookingSuccess(bookingData) {
-            const slotKey = `${bookingData.selectedDate}_${bookingData.selectedTime}`;
-            bookedSlots.push(slotKey);
-            localStorage.setItem('bookedSlots', JSON.stringify(bookedSlots));
-
-            document.getElementById('loadingDiv').style.display = 'none';
-            document.getElementById('successMessage').style.display = 'block';
-            
-            document.getElementById('bookingForm').reset();
-            document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
-            document.getElementById('priceDisplay').style.display = 'none';
-            selectedService = null;
-            selectedPrice = 0;
-            
-            setTimeout(() => {
-                document.getElementById('submitBtn').disabled = false;
-                document.getElementById('successMessage').style.display = 'none';
-            }, 5000);
-        }
-
-        // Handle booking error
-        function handleBookingError() {
-            document.getElementById('loadingDiv').style.display = 'none';
-            document.getElementById('submitBtn').disabled = false;
-            alert('There was an error sending your booking. Please try again or contact us directly.');
+            // Alternative options:
+            // window.open('next-page.html', '_blank'); // Opens in new tab
+            // window.location.href = 'https://your-website.com/next-page'; // External URL
         }
     </script>
 </body>
