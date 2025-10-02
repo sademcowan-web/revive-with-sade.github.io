@@ -227,8 +227,6 @@
         .flatpickr-day:hover { background: var(--primary-purple); color: var(--white); }
         .flatpickr-day.selected { background: var(--gold); color: var(--black); }
         .flatpickr-day.disabled { color: #666; }
-
-        /* Make Flatpickr calendar writing (days and months) white */
         .flatpickr-calendar,
         .flatpickr-calendar .flatpickr-day,
         .flatpickr-calendar .flatpickr-weekday,
@@ -391,7 +389,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initializeCalendar();
             initializeEventListeners();
-            populateTimeSlots();
+            populateTimeSlots(); // Populate with default (weekday) times
         });
 
         // Initialize calendar
@@ -402,12 +400,14 @@
                 dateFormat: "Y-m-d",
                 disable: [
                     function(date) {
+                        // Disable Sundays
                         return date.getDay() === 0;
                     }
                 ],
                 onChange: function(selectedDates) {
                     if (selectedDates.length > 0) {
                         updateAvailableTimeSlots(selectedDates[0]);
+                        populateTimeSlots(selectedDates[0]);
                     }
                 }
             });
@@ -455,17 +455,39 @@
                 document.getElementById('loadingDiv').style.display = 'block';
                 document.getElementById('submitBtn').disabled = true;
             });
+
+            // When date changes, update time slots appropriately
+            document.getElementById('bookingDate').addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                populateTimeSlots(selectedDate);
+                updateAvailableTimeSlots(selectedDate);
+            });
         }
 
-        // Populate time slots
-        function populateTimeSlots() {
+        // Populate time slots based on day of week
+        function populateTimeSlots(date = null) {
             const timeSelect = document.getElementById('bookingTime');
-            const times = [
-                '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-                '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-                '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
-                '18:00', '18:30', '19:00'
-            ];
+            let times = [];
+
+            if (date) {
+                const day = date.getDay();
+                if (day === 6) { // Saturday (9am - 5pm)
+                    times = [
+                        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+                        '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+                        '15:00', '15:30', '16:00', '16:30', '17:00'
+                    ];
+                } else { // Monday-Friday (5pm - 8pm)
+                    times = [
+                        '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'
+                    ];
+                }
+            } else {
+                // Default: Monday-Friday time slots (in case no date yet)
+                times = [
+                    '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'
+                ];
+            }
 
             timeSelect.innerHTML = '<option value="">Select Time</option>';
             times.forEach(time => {
@@ -480,12 +502,9 @@
         function updateAvailableTimeSlots(selectedDate) {
             const timeSelect = document.getElementById('bookingTime');
             const dateStr = selectedDate.toISOString().split('T')[0];
-            
             const options = timeSelect.querySelectorAll('option');
-            
             options.forEach(option => {
                 if (option.value === '') return;
-                
                 const slotKey = `${dateStr}_${option.value}`;
                 if (bookedSlots.includes(slotKey)) {
                     option.disabled = true;
@@ -505,11 +524,9 @@
 
             if (selectedPrice > 0) {
                 let finalPrice = selectedPrice;
-                
                 if (locationType === 'address') {
                     finalPrice = Math.round(selectedPrice * 1.5);
                 }
-
                 totalPriceElement.textContent = finalPrice.toLocaleString();
                 priceDisplay.style.display = 'block';
             } else {
@@ -523,20 +540,15 @@
                 "30min": { name: "Relaxation Session", duration: "30 Minutes" },
                 "60min": { name: "Full Body Massage", duration: "60 Minutes" }
             };
-            
             const serviceInfo = serviceDetails[selectedService] || 
                                { name: selectedService, duration: "Not specified" };
-            
             const locationType = document.getElementById('locationType').value;
             const finalPrice = document.getElementById('totalPrice').textContent;
-            
             // Compile service details
             const compiledServiceDetails = `${serviceInfo.name} (${serviceInfo.duration}) - ${finalPrice} Le`;
             document.getElementById('serviceDetails').value = compiledServiceDetails;
-            
             // Set final price
             document.getElementById('finalPrice').value = finalPrice + ' Le';
-            
             // Set submission timestamp
             document.getElementById('submissionTimestamp').value = new Date().toLocaleString();
         }
@@ -544,11 +556,8 @@
         // Validate form
         function validateForm() {
             let isValid = true;
-            
             document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-
             const requiredFields = ['firstName', 'lastName', 'phone', 'email', 'locationType', 'bookingDate', 'bookingTime'];
-            
             requiredFields.forEach(field => {
                 const element = document.getElementById(field);
                 if (!element.value.trim()) {
@@ -556,25 +565,21 @@
                     isValid = false;
                 }
             });
-
             if (!selectedService) {
                 document.getElementById('serviceError').textContent = 'Please select a service';
                 isValid = false;
             }
-
             if (document.getElementById('locationType').value === 'address' && 
                 !document.getElementById('clientAddress').value.trim()) {
                 document.getElementById('addressError').textContent = 'Please enter your address';
                 isValid = false;
             }
-
             const email = document.getElementById('email').value;
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (email && !emailRegex.test(email)) {
                 document.getElementById('emailError').textContent = 'Please enter a valid email address';
                 isValid = false;
             }
-
             return isValid;
         }
     </script>
