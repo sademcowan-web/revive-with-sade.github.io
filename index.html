@@ -170,16 +170,8 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
         }
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        .error-message {
-            color: var(--error);
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .error-message { color: var(--error); font-size: 0.9rem; margin-top: 5px; }
         .success-message {
             background: var(--success);
             color: var(--white);
@@ -189,11 +181,7 @@
             text-align: center;
             display: none;
         }
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
+        .loading { display: none; text-align: center; margin-top: 20px; }
         .spinner {
             border: 4px solid var(--primary-purple);
             border-top: 4px solid var(--gold);
@@ -204,12 +192,7 @@
             margin: 0 auto;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .footer {
-            text-align: center;
-            padding: 30px;
-            color: var(--light-purple);
-            font-size: 0.9rem;
-        }
+        .footer { text-align: center; padding: 30px; color: var(--light-purple); font-size: 0.9rem; }
         @media (max-width: 768px) {
             .container { padding: 15px; }
             .logo { font-size: 2.5rem; }
@@ -217,11 +200,8 @@
             .booking-form { padding: 25px; }
             .service-options { grid-template-columns: 1fr; }
         }
-        /* Custom Flatpickr styling */
-        .flatpickr-calendar {
-            background: var(--light-black);
-            border: 2px solid var(--primary-purple);
-        }
+        /* Flatpickr styling */
+        .flatpickr-calendar { background: var(--light-black); border: 2px solid var(--primary-purple); }
         .flatpickr-month { background: var(--primary-purple); color: var(--white); }
         .flatpickr-day { color: var(--white); }
         .flatpickr-day:hover { background: var(--primary-purple); color: var(--white); }
@@ -232,356 +212,241 @@
         .flatpickr-calendar .flatpickr-weekday,
         .flatpickr-calendar .flatpickr-current-month,
         .flatpickr-calendar .flatpickr-monthDropdown-months,
-        .flatpickr-calendar .flatpickr-months .flatpickr-month {
-            color: #fff !important;
-        }
-        .flatpickr-calendar .flatpickr-day {
-            color: #fff !important;
-        }
+        .flatpickr-calendar .flatpickr-months .flatpickr-month { color: #fff !important; }
+        .flatpickr-calendar .flatpickr-day { color: #fff !important; }
         .flatpickr-calendar .flatpickr-day.selected,
-        .flatpickr-calendar .flatpickr-day.today {
-            color: #222 !important;
-        }
-        .flatpickr-input {
-            color: #fff !important;
-        }
-        /* The gold next-page arrow CSS remains but the element is removed */
+        .flatpickr-calendar .flatpickr-day.today { color: #222 !important; }
+        .flatpickr-input { color: #fff !important; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1 class="logo">Revive with Sade</h1>
-            <p class="tagline">Premium Massage Therapy & Wellness</p>
-        </div>
-        <form class="booking-form" id="bookingForm" action="https://formspree.io/f/xldpgneq" method="POST">
-            <input type="hidden" name="_next" value="thank-you.html">
-            <input type="hidden" name="_subject" value="New Massage Booking Request">
-            <input type="hidden" name="_captcha" value="false">
-            <!-- Personal Information -->
-            <div class="form-section">
-                <h2 class="section-title">Personal Information</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="firstName">First Name *</label>
-                        <input type="text" id="firstName" name="firstName" required>
-                        <div class="error-message" id="firstNameError"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Last Name *</label>
-                        <input type="text" id="lastName" name="lastName" required>
-                        <div class="error-message" id="lastNameError"></div>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="phone">Phone Number *</label>
-                        <input type="tel" id="phone" name="phone" required>
-                        <div class="error-message" id="phoneError"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" id="email" name="email" required>
-                        <div class="error-message" id="emailError"></div>
-                    </div>
-                </div>
-            </div>
-            <!-- Location Selection -->
-            <div class="form-section">
-                <h2 class="section-title">Location Preference</h2>
-                <div class="form-group full-width">
-                    <label for="locationType">Where would you like your massage? *</label>
-                    <select id="locationType" name="locationType" required>
-                        <option value="">Select Location Type</option>
-                        <option value="destination">At Our Studio (Base Price)</option>
-                        <option value="address">At Your Address (Mobile Service)</option>
-                    </select>
-                    <div class="error-message" id="locationTypeError"></div>
-                </div>
-                <div class="address-dropdown" id="addressSection">
-                    <div class="form-group full-width">
-                        <label for="clientAddress">Your Address *</label>
-                        <textarea id="clientAddress" name="clientAddress" rows="3" placeholder="Please enter your full address"></textarea>
-                        <div class="error-message" id="addressError"></div>
-                    </div>
-                </div>
-            </div>
-            <!-- Service Selection -->
-            <div class="form-section">
-                <h2 class="section-title">Choose Your Service</h2>
-                <div class="service-options">
-                    <div class="service-card" data-service="30min" data-price="500">
-                        <div class="service-title">Relaxation Session</div>
-                        <div class="service-duration">30 Minutes</div>
-                        <div class="service-price">500 Le</div>
-                    </div>
-                    <div class="service-card" data-service="60min" data-price="1000">
-                        <div class="service-title">Full Body Massage</div>
-                        <div class="service-duration">60 Minutes</div>
-                        <div class="service-price">1,000 Le</div>
-                    </div>
-                </div>
-                <input type="hidden" id="selectedService" name="selectedService" required>
-                <input type="hidden" id="servicePrice" name="servicePrice" required>
-                <div class="error-message" id="serviceError"></div>
-            </div>
-            <!-- Date and Time Selection -->
-            <div class="form-section">
-                <h2 class="section-title">Select Date & Time</h2>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="bookingDate">Preferred Date *</label>
-                        <input type="text" id="bookingDate" name="bookingDate" placeholder="Select date" required>
-                        <div class="error-message" id="dateError"></div>
-                    </div>
-                    <div class="form-group">
-                        <label for="bookingTime">Preferred Time *</label>
-                        <select id="bookingTime" name="bookingTime" required>
-                            <option value="">Select Time</option>
-                        </select>
-                        <div class="error-message" id="timeError"></div>
-                    </div>
-                </div>
-            </div>
-            <!-- Additional Information -->
-            <div class="form-section">
-                <h2 class="section-title">Additional Information</h2>
-                <div class="form-group full-width">
-                    <label for="specialRequests">Special Requests or Health Considerations</label>
-                    <textarea id="specialRequests" name="specialRequests" rows="4" placeholder="Please let us know about any allergies, injuries, or special preferences..."></textarea>
-                </div>
-            </div>
-            <!-- Price Display -->
-            <div class="price-display" id="priceDisplay" style="display: none;">
-                Total: <span id="totalPrice">0</span> Le
-            </div>
-            <!-- Hidden fields for form data compilation -->
-            <input type="hidden" id="serviceDetails" name="serviceDetails">
-            <input type="hidden" id="finalPrice" name="finalPrice">
-            <input type="hidden" id="submissionTimestamp" name="submissionTimestamp">
-            <!-- Submit Button -->
-            <button type="submit" class="submit-btn" id="submitBtn">Book Your Session</button>
-            <div class="loading" id="loadingDiv">
-                <div class="spinner"></div>
-                <p>Sending your booking...</p>
-            </div>
-            <div class="success-message" id="successMessage">
-                Your booking has been submitted successfully! You will receive a confirmation email shortly.
-            </div>
-        </form>
-        <div class="footer">
-            <p>&copy; 2025 Revive with Sade. Professional massage therapy services.</p>
-            <p>Contact us: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="740611021d0211031d001c07151011341319151d185a171b19">[email&#160;protected]</a></p>
-        </div>
+<div class="container">
+    <div class="header">
+        <h1 class="logo">Revive with Sade</h1>
+        <p class="tagline">Premium Massage Therapy & Wellness</p>
     </div>
-    <!-- The gold next-page arrow has been removed. -->
-    <!-- Scripts -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        // Global variables
-        let selectedService = null;
-        let selectedPrice = 0;
-        let bookedSlots = JSON.parse(localStorage.getItem('bookedSlots') || '[]');
-        let calendar = null;
+    <form class="booking-form" id="bookingForm" action="https://formspree.io/f/xldpgneq" method="POST">
+        <input type="hidden" name="_next" value="thank-you.html">
+        <input type="hidden" name="_subject" value="New Massage Booking Request">
+        <input type="hidden" name="_captcha" value="false">
+        <!-- Personal Information -->
+        <div class="form-section">
+            <h2 class="section-title">Personal Information</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                    <div class="error-message" id="firstNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                    <div class="error-message" id="lastNameError"></div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" name="phone" required>
+                    <div class="error-message" id="phoneError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="error-message" id="emailError"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Location Selection -->
+        <div class="form-section">
+            <h2 class="section-title">Location Preference</h2>
+            <div class="form-group full-width">
+                <label for="locationType">Where would you like your massage? *</label>
+                <select id="locationType" name="locationType" required>
+                    <option value="">Select Location Type</option>
+                    <option value="destination">At Our Studio (Base Price)</option>
+                    <option value="address">At Your Address (Mobile Service)</option>
+                </select>
+                <div class="error-message" id="locationTypeError"></div>
+            </div>
+            <div class="address-dropdown" id="addressSection">
+                <div class="form-group full-width">
+                    <label for="clientAddress">Your Address *</label>
+                    <textarea id="clientAddress" name="clientAddress" rows="3" placeholder="Please enter your full address"></textarea>
+                    <div class="error-message" id="addressError"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Service Selection -->
+        <div class="form-section">
+            <h2 class="section-title">Choose Your Service</h2>
+            <div class="service-options">
+                <div class="service-card" data-service="30min" data-price="500">
+                    <div class="service-title">Relaxation Session</div>
+                    <div class="service-duration">30 Minutes</div>
+                    <div class="service-price">500 Le</div>
+                </div>
+                <div class="service-card" data-service="60min" data-price="1000">
+                    <div class="service-title">Full Body Massage</div>
+                    <div class="service-duration">60 Minutes</div>
+                    <div class="service-price">1,000 Le</div>
+                </div>
+            </div>
+            <input type="hidden" id="selectedService" name="selectedService" required>
+            <input type="hidden" id="servicePrice" name="servicePrice" required>
+            <div class="error-message" id="serviceError"></div>
+        </div>
+        <!-- Date and Time Selection -->
+        <div class="form-section">
+            <h2 class="section-title">Select Date & Time</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="bookingDate">Preferred Date *</label>
+                    <input type="text" id="bookingDate" name="bookingDate" placeholder="Select date" required>
+                    <div class="error-message" id="dateError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="bookingTime">Preferred Time *</label>
+                    <select id="bookingTime" name="bookingTime" required>
+                        <option value="">Select Time</option>
+                    </select>
+                    <div class="error-message" id="timeError"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Additional Information -->
+        <div class="form-section">
+            <h2 class="section-title">Additional Information</h2>
+            <div class="form-group full-width">
+                <label for="specialRequests">Special Requests or Health Considerations</label>
+                <textarea id="specialRequests" name="specialRequests" rows="4" placeholder="Please let us know about any allergies, injuries, or special preferences..."></textarea>
+            </div>
+        </div>
+        <!-- Price Display -->
+        <div class="price-display" id="priceDisplay" style="display: none;">
+            Total: <span id="totalPrice">0</span> Le
+        </div>
+        <input type="hidden" id="serviceDetails" name="serviceDetails">
+        <input type="hidden" id="finalPrice" name="finalPrice">
+        <input type="hidden" id="submissionTimestamp" name="submissionTimestamp">
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" id="submitBtn">Book Your Session</button>
+        <div class="loading" id="loadingDiv">
+            <div class="spinner"></div>
+            <p>Sending your booking...</p>
+        </div>
+        <div class="success-message" id="successMessage">
+            Your booking has been submitted successfully! You will receive a confirmation email shortly.
+        </div>
+    </form>
+    <div class="footer">
+        <p>&copy; 2025 Revive with Sade. Professional massage therapy services.</p>
+        <p>Contact us: <a href="mailto:info@revivewithsade.com">info@revivewithsade.com</a></p>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+let selectedService = null;
+let selectedPrice = 0;
+let selectedDuration = 0; // in minutes
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeCalendar();
-            initializeEventListeners();
-            populateTimeSlots(); // Populate with default (weekday) times
+document.addEventListener('DOMContentLoaded', function() {
+    populateTimeSlots();
+
+    // Initialize calendar
+    flatpickr("#bookingDate", {
+        minDate: "today",
+        maxDate: "2026-12-31",
+        dateFormat: "Y-m-d",
+        disable: [
+            function(date) { return date.getDay() === 0; } // Disable Sundays
+        ]
+    });
+
+    // Service selection
+    document.querySelectorAll('.service-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedService = this.dataset.service;
+            selectedPrice = parseInt(this.dataset.price);
+            selectedDuration = this.dataset.service === '30min' ? 30 : 60;
+            document.getElementById('selectedService').value = selectedService;
+            document.getElementById('servicePrice').value = selectedPrice;
+            updatePricing();
+            populateTimeSlots(); // Refresh smart time slots
         });
+    });
 
-        // Initialize calendar
-        function initializeCalendar() {
-            calendar = flatpickr("#bookingDate", {
-                minDate: "today",
-                maxDate: "2026-12-31",
-                dateFormat: "Y-m-d",
-                disable: [
-                    function(date) {
-                        // Disable Sundays
-                        return date.getDay() === 0;
-                    }
-                ],
-                onChange: function(selectedDates) {
-                    if (selectedDates.length > 0) {
-                        updateAvailableTimeSlots(selectedDates[0]);
-                        populateTimeSlots(selectedDates[0]);
-                    }
-                }
-            });
+    // Location selection
+    document.getElementById('locationType').addEventListener('change', function() {
+        const addressSection = document.getElementById('addressSection');
+        if (this.value === 'address') {
+            addressSection.classList.add('show');
+            document.getElementById('clientAddress').required = true;
+        } else {
+            addressSection.classList.remove('show');
+            document.getElementById('clientAddress').required = false;
         }
+        updatePricing();
+    });
 
-        // Initialize event listeners
-        function initializeEventListeners() {
-            document.getElementById('locationType').addEventListener('change', function() {
-                const addressSection = document.getElementById('addressSection');
-                if (this.value === 'address') {
-                    addressSection.classList.add('show');
-                    document.getElementById('clientAddress').required = true;
-                } else {
-                    addressSection.classList.remove('show');
-                    document.getElementById('clientAddress').required = false;
-                }
-                updatePricing();
-            });
+    // Time selection triggers smart filtering
+    document.getElementById('bookingTime').addEventListener('change', populateTimeSlots);
+});
 
-            document.querySelectorAll('.service-card').forEach(card => {
-                card.addEventListener('click', function() {
-                    document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
-                    this.classList.add('selected');
-                    
-                    selectedService = this.dataset.service;
-                    selectedPrice = parseInt(this.dataset.price);
-                    document.getElementById('selectedService').value = selectedService;
-                    document.getElementById('servicePrice').value = selectedPrice;
-                    
-                    updatePricing();
-                });
-            });
+function populateTimeSlots() {
+    const timeSelect = document.getElementById('bookingTime');
+    const currentValue = timeSelect.value; // preserve current selection
+    timeSelect.innerHTML = '<option value="">Select Time</option>';
 
-            // Fixed form submission handler - simpler approach
-            document.getElementById('bookingForm').addEventListener('submit', function(e) {
-                if (!validateForm()) {
-                    e.preventDefault();
-                    return;
-                }
+    const startHour = 11;
+    const endHour = 18;
+    const times = [];
 
-                // Prepare form data
-                prepareFormData();
-                
-                // Show loading state
-                document.getElementById('loadingDiv').style.display = 'block';
-                document.getElementById('submitBtn').disabled = true;
-            });
+    for (let hour = startHour; hour <= endHour; hour++) {
+        times.push(`${hour.toString().padStart(2,'0')}:00`);
+        times.push(`${hour.toString().padStart(2,'0')}:30`);
+    }
 
-            // When date changes, update time slots appropriately
-            document.getElementById('bookingDate').addEventListener('change', function() {
-                const selectedDate = new Date(this.value);
-                populateTimeSlots(selectedDate);
-                updateAvailableTimeSlots(selectedDate);
-            });
-        }
+    times.forEach(time => {
+        let option = document.createElement('option');
+        option.value = time;
+        option.textContent = time;
 
-        // Populate time slots based on day of week
-        function populateTimeSlots(date = null) {
-            const timeSelect = document.getElementById('bookingTime');
-            let times = [];
+        if (selectedDuration > 0 && currentValue) {
+            const [selH, selM] = currentValue.split(':').map(Number);
+            const selStart = selH * 60 + selM;
+            const selEnd = selStart + selectedDuration;
 
-            if (date) {
-                const day = date.getDay();
-                if (day === 6) { // Saturday (9am - 5pm)
-                    times = [
-                        '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-                        '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
-                        '15:00', '15:30', '16:00', '16:30', '17:00'
-                    ];
-                } else { // Monday-Friday (5pm - 8pm)
-                    times = [
-                        '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'
-                    ];
-                }
-            } else {
-                // Default: Monday-Friday time slots (in case no date yet)
-                times = [
-                    '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00'
-                ];
-            }
+            const [h, m] = time.split(':').map(Number);
+            const slotStart = h * 60 + m;
 
-            timeSelect.innerHTML = '<option value="">Select Time</option>';
-            times.forEach(time => {
-                const option = document.createElement('option');
-                option.value = time;
-                option.textContent = time;
-                timeSelect.appendChild(option);
-            });
-        }
-
-        // Update available time slots
-        function updateAvailableTimeSlots(selectedDate) {
-            const timeSelect = document.getElementById('bookingTime');
-            const dateStr = selectedDate.toISOString().split('T')[0];
-            const options = timeSelect.querySelectorAll('option');
-            options.forEach(option => {
-                if (option.value === '') return;
-                const slotKey = `${dateStr}_${option.value}`;
-                if (bookedSlots.includes(slotKey)) {
-                    option.disabled = true;
-                    option.textContent = `${option.value} (Booked)`;
-                } else {
-                    option.disabled = false;
-                    option.textContent = option.value;
-                }
-            });
-        }
-
-        // Update pricing display
-        function updatePricing() {
-            const locationType = document.getElementById('locationType').value;
-            const priceDisplay = document.getElementById('priceDisplay');
-            const totalPriceElement = document.getElementById('totalPrice');
-
-            if (selectedPrice > 0) {
-                let finalPrice = selectedPrice;
-                if (locationType === 'address') {
-                    finalPrice = Math.round(selectedPrice * 1.5);
-                }
-                totalPriceElement.textContent = finalPrice.toLocaleString();
-                priceDisplay.style.display = 'block';
-            } else {
-                priceDisplay.style.display = 'none';
+            if (slotStart >= selStart && slotStart < selEnd && time !== currentValue) {
+                option.disabled = true;
+                option.textContent += " (Unavailable)";
             }
         }
 
-        // Prepare form data with compiled information
-        function prepareFormData() {
-            const serviceDetails = {
-                "30min": { name: "Relaxation Session", duration: "30 Minutes" },
-                "60min": { name: "Full Body Massage", duration: "60 Minutes" }
-            };
-            const serviceInfo = serviceDetails[selectedService] || 
-                               { name: selectedService, duration: "Not specified" };
-            const locationType = document.getElementById('locationType').value;
-            const finalPrice = document.getElementById('totalPrice').textContent;
-            // Compile service details
-            const compiledServiceDetails = `${serviceInfo.name} (${serviceInfo.duration}) - ${finalPrice} Le`;
-            document.getElementById('serviceDetails').value = compiledServiceDetails;
-            // Set final price
-            document.getElementById('finalPrice').value = finalPrice + ' Le';
-            // Set submission timestamp
-            document.getElementById('submissionTimestamp').value = new Date().toLocaleString();
-        }
+        if (time === currentValue) option.selected = true;
+        timeSelect.appendChild(option);
+    });
+}
 
-        // Validate form
-        function validateForm() {
-            let isValid = true;
-            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-            const requiredFields = ['firstName', 'lastName', 'phone', 'email', 'locationType', 'bookingDate', 'bookingTime'];
-            requiredFields.forEach(field => {
-                const element = document.getElementById(field);
-                if (!element.value.trim()) {
-                    document.getElementById(field + 'Error').textContent = 'This field is required';
-                    isValid = false;
-                }
-            });
-            if (!selectedService) {
-                document.getElementById('serviceError').textContent = 'Please select a service';
-                isValid = false;
-            }
-            if (document.getElementById('locationType').value === 'address' && 
-                !document.getElementById('clientAddress').value.trim()) {
-                document.getElementById('addressError').textContent = 'Please enter your address';
-                isValid = false;
-            }
-            const email = document.getElementById('email').value;
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email && !emailRegex.test(email)) {
-                document.getElementById('emailError').textContent = 'Please enter a valid email address';
-                isValid = false;
-            }
-            return isValid;
-        }
-    </script>
+function updatePricing() {
+    const locationType = document.getElementById('locationType').value;
+    const priceDisplay = document.getElementById('priceDisplay');
+    const totalPriceElement = document.getElementById('totalPrice');
+
+    if (selectedPrice > 0) {
+        let finalPrice = selectedPrice;
+        if (locationType === 'address') finalPrice = Math.round(selectedPrice * 1.5);
+        totalPriceElement.textContent = finalPrice.toLocaleString();
+        priceDisplay.style.display = 'block';
+    } else {
+        priceDisplay.style.display = 'none';
+    }
+}
+</script>
 </body>
 </html>
