@@ -350,20 +350,23 @@ let selectedService = null;
 let selectedPrice = 0;
 let selectedDuration = 0; // in minutes
 
+// Example of booked slots: date => array of booked times
+// Format: "YYYY-MM-DD": ["11:00", "13:30"]
+let bookedSlots = {
+    "2025-11-12": ["11:00"], // Example: 12th Nov already booked 11am
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     populateTimeSlots();
 
-    // Initialize calendar
     flatpickr("#bookingDate", {
         minDate: "today",
         maxDate: "2026-12-31",
         dateFormat: "Y-m-d",
-        disable: [
-            function(date) { return date.getDay() === 0; } // Disable Sundays
-        ]
+        disable: [date => date.getDay() === 0], // Disable Sundays
+        onChange: populateTimeSlots
     });
 
-    // Service selection
     document.querySelectorAll('.service-card').forEach(card => {
         card.addEventListener('click', function() {
             document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
@@ -374,11 +377,10 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('selectedService').value = selectedService;
             document.getElementById('servicePrice').value = selectedPrice;
             updatePricing();
-            populateTimeSlots(); // Refresh smart time slots
+            populateTimeSlots();
         });
     });
 
-    // Location selection
     document.getElementById('locationType').addEventListener('change', function() {
         const addressSection = document.getElementById('addressSection');
         if (this.value === 'address') {
@@ -390,62 +392,46 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         updatePricing();
     });
-
-    // Time selection triggers smart filtering
-    document.getElementById('bookingTime').addEventListener('change', populateTimeSlots);
 });
+
+function updatePricing() {
+    let locationMultiplier = document.getElementById('locationType').value === 'address' ? 1.2 : 1;
+    let total = selectedPrice * locationMultiplier;
+    document.getElementById('priceDisplay').style.display = total ? 'block' : 'none';
+    document.getElementById('totalPrice').textContent = total.toFixed(0);
+    document.getElementById('finalPrice').value = total.toFixed(0);
+}
 
 function populateTimeSlots() {
     const timeSelect = document.getElementById('bookingTime');
-    const currentValue = timeSelect.value; // preserve current selection
+    const currentValue = timeSelect.value;
     timeSelect.innerHTML = '<option value="">Select Time</option>';
 
     const startHour = 11;
     const endHour = 18;
     const times = [];
-
     for (let hour = startHour; hour <= endHour; hour++) {
         times.push(`${hour.toString().padStart(2,'0')}:00`);
         times.push(`${hour.toString().padStart(2,'0')}:30`);
     }
+
+    const selectedDate = document.getElementById('bookingDate').value;
 
     times.forEach(time => {
         let option = document.createElement('option');
         option.value = time;
         option.textContent = time;
 
-        if (selectedDuration > 0 && currentValue) {
-            const [selH, selM] = currentValue.split(':').map(Number);
-            const selStart = selH * 60 + selM;
-            const selEnd = selStart + selectedDuration;
-
-            const [h, m] = time.split(':').map(Number);
-            const slotStart = h * 60 + m;
-
-            if (slotStart >= selStart && slotStart < selEnd && time !== currentValue) {
+        // Disable if already booked
+        if (selectedDate && bookedSlots[selectedDate]) {
+            if (bookedSlots[selectedDate].includes(time)) {
                 option.disabled = true;
                 option.textContent += " (Unavailable)";
             }
         }
 
-        if (time === currentValue) option.selected = true;
         timeSelect.appendChild(option);
     });
-}
-
-function updatePricing() {
-    const locationType = document.getElementById('locationType').value;
-    const priceDisplay = document.getElementById('priceDisplay');
-    const totalPriceElement = document.getElementById('totalPrice');
-
-    if (selectedPrice > 0) {
-        let finalPrice = selectedPrice;
-        if (locationType === 'address') finalPrice = Math.round(selectedPrice * 1.5);
-        totalPriceElement.textContent = finalPrice.toLocaleString();
-        priceDisplay.style.display = 'block';
-    } else {
-        priceDisplay.style.display = 'none';
-    }
 }
 </script>
 </body>
