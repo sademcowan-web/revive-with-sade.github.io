@@ -350,8 +350,6 @@ let selectedService = null;
 let selectedPrice = 0;
 let selectedDuration = 0; // in minutes
 
-// Example of booked slots: date => array of booked times
-// Format: "YYYY-MM-DD": ["11:00", "13:30"]
 let bookedSlots = {
     "2025-11-12": ["11:00"], // Example: 12th Nov already booked 11am
 };
@@ -410,6 +408,7 @@ function populateTimeSlots() {
     const startHour = 11;
     const endHour = 18;
     const times = [];
+
     for (let hour = startHour; hour <= endHour; hour++) {
         times.push(`${hour.toString().padStart(2,'0')}:00`);
         times.push(`${hour.toString().padStart(2,'0')}:30`);
@@ -417,21 +416,25 @@ function populateTimeSlots() {
 
     const selectedDate = document.getElementById('bookingDate').value;
 
-    times.forEach(time => {
+    times.forEach((time, index) => {
+        if (selectedDate && bookedSlots[selectedDate]) {
+            const prevTime = times[index - 1];
+            if (prevTime && selectedDuration === 60 && bookedSlots[selectedDate].includes(prevTime)) {
+                return;
+            }
+        }
+        if (selectedDate && bookedSlots[selectedDate] && bookedSlots[selectedDate].includes(time)) {
+            return;
+        }
         let option = document.createElement('option');
         option.value = time;
         option.textContent = time;
-
-        // Disable if already booked
-        if (selectedDate && bookedSlots[selectedDate]) {
-            if (bookedSlots[selectedDate].includes(time)) {
-                option.disabled = true;
-                option.textContent += " (Unavailable)";
-            }
-        }
-
         timeSelect.appendChild(option);
     });
+
+    if ([...timeSelect.options].some(opt => opt.value === currentValue)) {
+        timeSelect.value = currentValue;
+    }
 }
 </script>
 </body>
